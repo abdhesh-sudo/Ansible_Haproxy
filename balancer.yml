@@ -1,0 +1,58 @@
+---
+
+- name: playbook for httpd.yml
+  hosts: webserver
+  tasks: 
+    - name: install httpd pakcage
+      package: 
+          name: "httpd"
+          state: present
+
+    - name: copy the file content to the remote host 
+      template: 
+           dest: "/var/www/html/index.html"
+           src: "index.html.j2"
+
+    - name: start the httpd service
+      service: 
+          name: "httpd"
+          state: started
+          enabled: yes 
+
+    - name: Allow tho Access on port no 80 
+      firewalld: 
+           port: "80/tcp"
+           state: enabled
+           permanent: yes 
+           immediate: yes 
+
+
+
+- name: playbook for haproxy
+  hosts: mylb
+  tasks: 
+    - name: install haproxy package
+      package: 
+         name: "haproxy"
+         state: present
+      
+    - name: copy the confguration to the managenode
+      template: 
+          dest: "/etc/haproxy/haproxy.cfg"
+          src: "haproxy.cfg.j2"
+
+    - name: start the haproxy service
+      service: 
+          name: "haproxy"
+          state: restarted
+          enabled: yes 
+
+    - name: Allow the Access to haproxy 
+      firewalld: 
+           port: "8080/tcp"
+           permanent: yes 
+           immediate: yes 
+           state: enabled      
+           
+...           
+                 
